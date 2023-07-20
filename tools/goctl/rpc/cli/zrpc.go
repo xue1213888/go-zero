@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	errInvalidGrpcOutput = errors.New("ZRPC: missing --go-grpc_out")
-	errInvalidGoOutput   = errors.New("ZRPC: missing --go_out")
+	errInvalidGrpcOutput = errors.New("ZRPC: missing --go-grpc_out or --gogofaster_out")
+	errInvalidGoOutput   = errors.New("ZRPC: missing --go_out or --gogofaster_out")
 	errInvalidZrpcOutput = errors.New("ZRPC: missing zrpc output, please use --zrpc_out to specify the output")
 )
 
@@ -30,21 +30,34 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	source := args[0]
 	grpcOutList := VarStringSliceGoGRPCOut
 	goOutList := VarStringSliceGoOut
+	gogoFasterOutList := VarStringSliceGoGoFasterOut
 	zrpcOut := VarStringZRPCOut
 	style := VarStringStyle
 	home := VarStringHome
 	remote := VarStringRemote
 	branch := VarStringBranch
 	verbose := VarBoolVerbose
-	if len(grpcOutList) == 0 {
+	if len(grpcOutList) == 0 && len(gogoFasterOutList) == 0 {
 		return errInvalidGrpcOutput
 	}
-	if len(goOutList) == 0 {
+	if len(goOutList) == 0 && len(gogoFasterOutList) == 0 {
 		return errInvalidGoOutput
 	}
-	goOut := goOutList[len(goOutList)-1]
-	grpcOut := grpcOutList[len(grpcOutList)-1]
-	if len(goOut) == 0 {
+	var (
+		goOut         string
+		grpcOut       string
+		gogoFasterOut string
+	)
+	if len(goOutList) != 0 {
+		goOut = goOutList[len(goOutList)-1]
+	}
+	if len(grpcOutList) != 0 {
+		grpcOut = grpcOutList[len(grpcOutList)-1]
+	}
+	if len(gogoFasterOutList) != 0 {
+		gogoFasterOut = gogoFasterOutList[len(gogoFasterOutList)-1]
+	}
+	if len(goOut) == 0 && len(gogoFasterOut) == 0 {
 		return errInvalidGrpcOutput
 	}
 	if len(zrpcOut) == 0 {
@@ -58,11 +71,19 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	gogoFasterAbs, err := filepath.Abs(gogoFasterOut)
+	if err != nil {
+		return err
+	}
 	err = pathx.MkdirIfNotExist(goOutAbs)
 	if err != nil {
 		return err
 	}
 	err = pathx.MkdirIfNotExist(grpcOutAbs)
+	if err != nil {
+		return err
+	}
+	err = pathx.MkdirIfNotExist(gogoFasterAbs)
 	if err != nil {
 		return err
 	}
@@ -89,6 +110,10 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	gogoFasterOut, err = filepath.Abs(gogoFasterOut)
+	if err != nil {
+		return err
+	}
 	zrpcOut, err = filepath.Abs(zrpcOut)
 	if err != nil {
 		return err
@@ -99,6 +124,7 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	ctx.Src = source
 	ctx.GoOutput = goOut
 	ctx.GrpcOutput = grpcOut
+	ctx.GoGoFasterOutput = gogoFasterOut
 	ctx.IsGooglePlugin = isGooglePlugin
 	ctx.Output = zrpcOut
 	ctx.ProtocCmd = strings.Join(protocArgs, " ")
@@ -118,11 +144,17 @@ func wrapProtocCmd(name string, args []string) []string {
 	for _, goGRPCOpt := range VarStringSliceGoGRPCOpt {
 		ret = append(ret, "--go-grpc_opt", goGRPCOpt)
 	}
+	for _, gogoFasterOpt := range VarStringSliceGoGoFasterOpt {
+		ret = append(ret, "--gogofaster_opt", gogoFasterOpt)
+	}
 	for _, goOut := range VarStringSliceGoOut {
 		ret = append(ret, "--go_out", goOut)
 	}
 	for _, goGRPCOut := range VarStringSliceGoGRPCOut {
 		ret = append(ret, "--go-grpc_out", goGRPCOut)
+	}
+	for _, gogoFasterOut := range VarStringSliceGoGoFasterOut {
+		ret = append(ret, "--gogofaster_out", gogoFasterOut)
 	}
 	for _, plugin := range VarStringSlicePlugin {
 		ret = append(ret, "--plugin="+plugin)

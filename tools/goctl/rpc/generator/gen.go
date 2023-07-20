@@ -23,7 +23,8 @@ type ZRpcContext struct {
 	// GoOutput is the output directory of the generated go files.
 	GoOutput string
 	// GrpcOutput is the output directory of the generated grpc files.
-	GrpcOutput string
+	GrpcOutput       string
+	GoGoFasterOutput string
 	// Output is the output directory of the generated files.
 	Output string
 	// Multiple is the flag to indicate whether the proto file is generated in multiple mode.

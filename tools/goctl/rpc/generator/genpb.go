@@ -38,7 +38,12 @@ func (g *Generator) setPbDir(ctx DirContext, c *ZRpcContext) error {
 	if len(pbDir) == 0 {
 		return fmt.Errorf("pg.go is not found under %q", c.GoOutput)
 	}
-	grpcDir, err := findPbFile(c.GrpcOutput, true)
+	var grpcDir string
+	if len(c.GoGoFasterOutput) != 0 {
+		grpcDir = pbDir
+		goto RET
+	}
+	grpcDir, err = findPbFile(c.GrpcOutput, true)
 	if err != nil {
 		return err
 	}
@@ -53,6 +58,7 @@ func (g *Generator) setPbDir(ctx DirContext, c *ZRpcContext) error {
 		return fmt.Errorf("the output of pb.go and _grpc.pb.go must not be the same "+
 			"with --zrpc_out:\npb output: %s\nzrpc out: %s", pbDir, c.Output)
 	}
+RET:
 	ctx.SetPbDir(pbDir, grpcDir)
 	return nil
 }

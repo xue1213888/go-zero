@@ -25,7 +25,8 @@ var (
 	// VarStringSliceGoOut describes the go output.
 	VarStringSliceGoOut []string
 	// VarStringSliceGoGRPCOut describes the grpc output.
-	VarStringSliceGoGRPCOut []string
+	VarStringSliceGoGRPCOut     []string
+	VarStringSliceGoGoFasterOut []string
 	// VarStringSlicePlugin describes the protoc plugin.
 	VarStringSlicePlugin []string
 	// VarStringSliceProtoPath describes the proto path.
@@ -33,7 +34,8 @@ var (
 	// VarStringSliceGoOpt describes the go options.
 	VarStringSliceGoOpt []string
 	// VarStringSliceGoGRPCOpt describes the grpc options.
-	VarStringSliceGoGRPCOpt []string
+	VarStringSliceGoGRPCOpt     []string
+	VarStringSliceGoGoFasterOpt []string
 	// VarStringStyle describes the style of output files.
 	VarStringStyle string
 	// VarStringZRPCOut describes the zRPC output.
