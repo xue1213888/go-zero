@@ -31,15 +31,19 @@ func (g *Generator) genPbDirect(ctx DirContext, c *ZRpcContext) error {
 }
 
 func (g *Generator) setPbDir(ctx DirContext, c *ZRpcContext) error {
+	if c.IsGogoFaster {
+		c.GoOutput = c.GoGoFasterOutput
+		c.GrpcOutput = c.GoGoFasterOutput
+	}
 	pbDir, err := findPbFile(c.GoOutput, false)
 	if err != nil {
 		return err
 	}
 	if len(pbDir) == 0 {
-		return fmt.Errorf("pg.go is not found under %q", c.GoOutput)
+		return fmt.Errorf("pb.go is not found under %q", c.GoOutput)
 	}
 	var grpcDir string
-	if len(c.GoGoFasterOutput) != 0 {
+	if c.IsGogoFaster {
 		grpcDir = pbDir
 		goto RET
 	}

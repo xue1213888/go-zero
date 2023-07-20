@@ -54,8 +54,14 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	if len(grpcOutList) != 0 {
 		grpcOut = grpcOutList[len(grpcOutList)-1]
 	}
+	gogoFaster := false
 	if len(gogoFasterOutList) != 0 {
 		gogoFasterOut = gogoFasterOutList[len(gogoFasterOutList)-1]
+		start := strings.Index(gogoFasterOut, ":")
+		if start != -1 {
+			gogoFasterOut = gogoFasterOut[start+1:]
+		}
+		gogoFaster = true
 	}
 	if len(goOut) == 0 && len(gogoFasterOut) == 0 {
 		return errInvalidGrpcOutput
@@ -129,6 +135,7 @@ func ZRPC(_ *cobra.Command, args []string) error {
 	ctx.Output = zrpcOut
 	ctx.ProtocCmd = strings.Join(protocArgs, " ")
 	ctx.IsGenClient = VarBoolClient
+	ctx.IsGogoFaster = gogoFaster
 	g := generator.NewGenerator(style, verbose)
 	return g.Generate(&ctx)
 }

@@ -31,6 +31,8 @@ type ZRpcContext struct {
 	Multiple bool
 	// Whether to generate rpc client
 	IsGenClient bool
+
+	IsGogoFaster bool
 }
 
 // Generate generates a rpc service, through the proto file,
